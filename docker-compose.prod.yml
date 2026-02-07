@@ -1,0 +1,47 @@
+services:
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: wiame-vllm
+    ports:
+      - "8000:8000"
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
+    command: >
+      --model Qwen/Qwen3-14B-AWQ
+      --quantization awq
+      --max-model-len 32768
+      --gpu-memory-utilization 0.80
+      --host 0.0.0.0
+      --port 8000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  mcp-server:
+    image: ghcr.io/77dido/wiame-llm/mcp-server:latest
+    container_name: wiame-mcp
+    ports:
+      - "3100:3100"
+    environment:
+      - VLLM_BASE_URL=http://vllm:8000/v1
+      - MCP_PORT=3100
+    depends_on:
+      vllm:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  huggingface-cache:
