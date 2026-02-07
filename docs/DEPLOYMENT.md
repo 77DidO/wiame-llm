@@ -11,7 +11,30 @@
 | Docker | 24.0+ | 25.0+ |
 | NVIDIA Driver | 535+ | 550+ |
 
-## Installation
+## Installation rapide
+
+```bash
+# 1. Cloner le projet
+git clone https://github.com/77DidO/wiame-llm.git
+cd wiame-llm
+
+# 2. Créer le fichier .env avec ton token Hugging Face
+cat > .env << 'EOF'
+HF_TOKEN=hf_xxxxxxxxxxxxxxxxxx
+EOF
+
+# 3. Lancer (télécharge le modèle ~30GB, 5-10 min)
+docker compose up -d
+
+# 4. Suivre le chargement
+docker logs -f wiame-vllm
+```
+
+Quand tu vois `Uvicorn running on http://0.0.0.0:8000` → c'est prêt.
+
+---
+
+## Installation détaillée
 
 ### 1. NVIDIA Container Toolkit
 
@@ -38,22 +61,26 @@ docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
 
 ```bash
 cd /opt
-sudo git clone https://github.com/votre-org/wiame-llm.git
+sudo git clone https://github.com/77DidO/wiame-llm.git
 sudo chown -R $USER:$USER wiame-llm
 cd wiame-llm
 ```
 
-### 3. Configuration
+### 3. Créer le fichier .env
+
+Le fichier `.env` contient le token Hugging Face (non versionné pour sécurité).
 
 ```bash
-cp .env.example .env
-nano .env
+cat > .env << 'EOF'
+HF_TOKEN=hf_xxxxxxxxxxxxxxxxxx
+EOF
 ```
 
-```env
-# Token Hugging Face (requis pour télécharger Qwen3)
-HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxx
-```
+**Pour obtenir un token Hugging Face :**
+1. Créer un compte sur https://huggingface.co
+2. Settings → Access Tokens → New token
+3. Type : Read
+4. Copier le token (commence par `hf_`)
 
 ### 4. Démarrage
 
