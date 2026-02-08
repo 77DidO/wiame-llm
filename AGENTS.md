@@ -78,9 +78,10 @@ curl http://localhost:8000/v1/models
 
 ## Points d'attention
 
-1. **Nom du modèle** : Toujours `Qwen/Qwen3-14B-AWQ` (avec préfixe `Qwen/`)
-2. **Port vLLM** : 8000 (interne Docker et exposé)
-3. **Port MCP** : 3100 (mais MCP utilise stdio principalement)
+1. **Nom du modèle** : Le serveur expose le modèle sous le nom `qwen3` (via `--served-model-name qwen3`). Le nom HuggingFace `Qwen/Qwen3-14B-AWQ` n'apparaît que dans la commande `--model` du docker-compose.
+2. **Réseau Docker** : Réseau externe `wiame-net` partagé avec RAGWiame et WIAME CR. Créer avec `docker network create wiame-net`.
+3. **Port vLLM** : 8000 (interne Docker et exposé)
+4. **Port MCP** : 3100 (mais MCP utilise stdio principalement)
 4. **HF_TOKEN** : Requis pour télécharger le modèle depuis Hugging Face
 5. **VRAM** : Le modèle prend ~10GB, laisser de la marge pour contexte
 
@@ -112,4 +113,4 @@ Endpoints compatibles :
 ## Liens projets liés
 
 - **CRAutomatique2** : `c:\Projets\CRAutomatique2` - Client WIAME CR
-- **WiameRag** : Client RAG Python (à créer)
+- **RAGWiame** : `c:\Projets\RAGWiame` - Plateforme RAG marchés publics (accède à vLLM via réseau `wiame-net`)

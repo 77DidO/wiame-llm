@@ -11,6 +11,7 @@ Serveur LLM local mutualisé pour les projets Wiame, exposant Qwen3-14B via vLLM
 | VRAM | ~10GB |
 | Contexte | 32k tokens |
 | API | OpenAI-compatible + MCP |
+| Served model name | `qwen3` |
 
 ## Architecture
 
@@ -21,6 +22,7 @@ Serveur LLM local mutualisé pour les projets Wiame, exposant Qwen3-14B via vLLM
 │  ┌──────────────────────────────────┐  │
 │  │  vLLM Server                     │  │
 │  │  Model: Qwen3-14B-AWQ            │  │
+│  │  Served as: qwen3                │  │
 │  │  VRAM: ~8GB                      │  │
 │  │  API: http://localhost:8000/v1   │  │
 │  └──────────────────────────────────┘  │
@@ -78,7 +80,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="Qwen/Qwen3-14B-AWQ",
+    model="qwen3",
     messages=[
         {"role": "user", "content": "Résume cette réunion..."}
     ]
@@ -126,6 +128,39 @@ Ou en mode développement local :
 | `summarize` | Résumé en français (brief/detailed/bullet-points) |
 | `rag_query` | Réponse basée sur contexte (RAG) |
 | `health` | Vérification état du serveur |
+
+## Réseau Docker partagé
+
+wiame-llm utilise un réseau Docker externe `wiame-net` pour permettre aux autres projets (RAGWiame, WIAME CR) de communiquer avec le serveur vLLM.
+
+**Créer le réseau (une seule fois)** :
+
+```bash
+docker network create wiame-net
+```
+
+Les autres projets doivent aussi déclarer ce réseau dans leur `docker-compose.yml` :
+
+```yaml
+networks:
+  wiame-net:
+    external: true
+```
+
+Puis accéder au vLLM via `http://wiame-vllm:8000/v1` (nom du container).
+
+## Paramètres de sampling recommandés (Qwen3)
+
+Les clients doivent respecter les recommandations officielles Qwen3 :
+
+| Mode | temperature | top_p | top_k | presence_penalty |
+|------|------------|-------|-------|-----------------|
+| Thinking ON | 0.6 | 0.95 | 20 | 1.5 |
+| Thinking OFF | 0.7 | 0.8 | 20 | 1.5 |
+
+**NE PAS utiliser `temperature=0.0`** (greedy decoding) — provoque des boucles infinies et des répétitions.
+
+Le `presence_penalty=1.5` est recommandé pour les modèles AWQ quantifiés.
 
 ## Configuration
 

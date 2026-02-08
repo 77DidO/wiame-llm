@@ -11,6 +11,7 @@ services:
       - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
     command: >
       --model Qwen/Qwen3-14B-AWQ
+      --served-model-name qwen3
       --quantization awq
       --max-model-len 32768
       --gpu-memory-utilization 0.80
@@ -30,6 +31,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 120s
+    networks:
+      - wiame-net
 
   mcp-server:
     build: ./mcp-server
@@ -43,6 +46,12 @@ services:
       vllm:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - wiame-net
+
+networks:
+  wiame-net:
+    external: true
 
 volumes:
   huggingface-cache:

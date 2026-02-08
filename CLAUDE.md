@@ -70,7 +70,7 @@ curl http://localhost:8000/v1/models
 curl http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "Qwen/Qwen3-14B-AWQ",
+    "model": "qwen3",
     "messages": [{"role": "user", "content": "Bonjour"}]
   }'
 ```
@@ -92,7 +92,7 @@ curl http://localhost:8000/v1/chat/completions \
 // backend/.env
 OPENAI_BASE_URL=http://localhost:8000/v1
 OPENAI_API_KEY=not-needed
-OPENAI_MODEL=Qwen/Qwen3-14B-AWQ
+OPENAI_MODEL=qwen3
 ```
 
 ### WiameRag (LangChain)
@@ -101,7 +101,7 @@ from langchain_openai import ChatOpenAI
 llm = ChatOpenAI(
     base_url="http://localhost:8000/v1",
     api_key="not-needed",
-    model="Qwen/Qwen3-14B-AWQ"
+    model="qwen3"
 )
 ```
 
