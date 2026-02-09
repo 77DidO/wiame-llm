@@ -1,6 +1,6 @@
 services:
   vllm:
-    image: vllm/vllm-openai:latest
+    image: lmcache/vllm-openai:build-latest
     container_name: wiame-vllm
     ports:
       - "8000:8000"
