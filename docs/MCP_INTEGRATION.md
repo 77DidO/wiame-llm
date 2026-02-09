@@ -4,32 +4,27 @@ Guide pour connecter des clients MCP au serveur wiame-llm.
 
 ## Claude Code / Claude Desktop
 
-### Configuration
+Le serveur MCP utilise le transport **SSE** (Server-Sent Events) via HTTP sur le port 3100.
 
-Éditer `~/.claude/claude_desktop_config.json` (ou créer le fichier) :
+### Configuration locale (vLLM tourne sur la machine)
 
 ```json
 {
   "mcpServers": {
     "wiame-llm": {
-      "command": "node",
-      "args": ["c:/Projets/wiame-llm/mcp-server/dist/index.js"],
-      "env": {
-        "VLLM_BASE_URL": "http://localhost:8000/v1"
-      }
+      "url": "http://localhost:3100/sse"
     }
   }
 }
 ```
 
-### Via Docker (production)
+### Via Docker (production, même réseau wiame-net)
 
 ```json
 {
   "mcpServers": {
     "wiame-llm": {
-      "command": "docker",
-      "args": ["exec", "-i", "wiame-mcp", "node", "dist/index.js"]
+      "url": "http://wiame-mcp:3100/sse"
     }
   }
 }
@@ -57,7 +52,7 @@ Devrait lister `wiame-llm` avec ses 5 tools.
     {
       "title": "Qwen3-14B (local)",
       "provider": "openai",
-      "model": "Qwen/Qwen3-14B-AWQ",
+      "model": "qwen3",
       "apiBase": "http://localhost:8000/v1",
       "apiKey": "not-needed"
     }
@@ -85,7 +80,7 @@ from langchain_openai import ChatOpenAI
 llm = ChatOpenAI(
     base_url="http://localhost:8000/v1",
     api_key="not-needed",
-    model="Qwen/Qwen3-14B-AWQ",
+    model="qwen3",
     temperature=0.7,
     max_tokens=2048
 )
@@ -106,7 +101,7 @@ const openai = new OpenAI({
 });
 
 const response = await openai.chat.completions.create({
-  model: 'Qwen/Qwen3-14B-AWQ',
+  model: 'qwen3',
   messages: [
     { role: 'system', content: 'Tu es un assistant professionnel.' },
     { role: 'user', content: 'Bonjour !' }
@@ -199,7 +194,7 @@ docker logs wiame-vllm
 
 ### "Model not found"
 
-Le nom exact du modèle est `Qwen/Qwen3-14B-AWQ` (avec le préfixe `Qwen/`).
+Le modèle est servi sous le nom `qwen3` (via `--served-model-name qwen3`). Pour les clients API directs (pas MCP), utiliser `model: "qwen3"`.
 
 ### Timeout sur longues requêtes
 

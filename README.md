@@ -90,34 +90,21 @@ print(response.choices[0].message.content)
 
 ### MCP (pour VSCode / Claude Code)
 
-Ajouter dans `~/.claude/claude_desktop_config.json` :
+Le serveur MCP utilise le transport **SSE** (Server-Sent Events) sur le port 3100.
+
+Ajouter dans les settings MCP de Claude Code :
 
 ```json
 {
   "mcpServers": {
     "wiame-llm": {
-      "command": "docker",
-      "args": ["exec", "-i", "wiame-mcp", "node", "dist/index.js"]
+      "url": "http://localhost:3100/sse"
     }
   }
 }
 ```
 
-Ou en mode développement local :
-
-```json
-{
-  "mcpServers": {
-    "wiame-llm": {
-      "command": "node",
-      "args": ["c:/Projets/wiame-llm/mcp-server/dist/index.js"],
-      "env": {
-        "VLLM_BASE_URL": "http://localhost:8000/v1"
-      }
-    }
-  }
-}
-```
+En Docker sur le même réseau `wiame-net`, utiliser `http://wiame-mcp:3100/sse`.
 
 ## Tools MCP disponibles
 
@@ -176,6 +163,12 @@ Le `presence_penalty=1.5` est recommandé pour les modèles AWQ quantifiés.
 
 - VRAM utilisée : ~8GB (Qwen3-14B Q4)
 - Marge restante : ~40GB pour WhisperX/PyAnnote
+
+## Compatibilité GPU Blackwell (RTX Pro 5000)
+
+L'image Docker standard `vllm/vllm-openai:latest` est incompatible avec les GPU Blackwell (SM120, driver 580+, CUDA 13.0). Le projet utilise l'image `lmcache/vllm-openai:build-latest` qui supporte Blackwell nativement.
+
+Si vous passez sur un GPU non-Blackwell (Ampere, Ada Lovelace), vous pouvez revenir à l'image standard.
 
 ## Upgrade vers Qwen3-Coder-14B
 
