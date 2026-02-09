@@ -222,6 +222,39 @@ docker compose build mcp-server --no-cache
 docker compose up -d mcp-server
 ```
 
+## Outils d'administration serveur
+
+### Portainer (gestion Docker via web)
+
+```bash
+# Installer Portainer CE
+docker volume create portainer_data
+
+docker run -d -p 8000:8000 -p 9443:9443 \
+  --name portainer --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce:lts
+```
+
+Accès : `https://<IP_SERVEUR>:9443` (HTTPS auto-signé).
+Permet de gérer containers, logs, volumes, réseaux depuis un navigateur.
+
+### Cockpit (administration serveur)
+
+```bash
+sudo apt install cockpit -y
+sudo systemctl enable --now cockpit.socket
+```
+
+Accès : `https://<IP_SERVEUR>:9090` (login = compte Linux du serveur).
+Permet de surveiller CPU, RAM, stockage, réseau et d'accéder au terminal.
+
+**Optionnel** — historique des métriques (nécessite accès internet pour apt) :
+```bash
+sudo apt install cockpit-pcp -y
+```
+
 ## Sauvegarde
 
 ```bash
